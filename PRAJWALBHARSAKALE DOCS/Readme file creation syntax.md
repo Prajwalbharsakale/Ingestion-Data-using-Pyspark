@@ -120,9 +120,9 @@ Feel free to contribute by submitting a pull request.
 we have to give "|" for column and "-" for rows sepration
 
 #### Example
-	|Col1|Col2|
- 	|----|----|
-  	|value1|value2|
+|Col1|Col2|
+|----|----|
+|value1|value2|
    
 ### Creating the README File
 
