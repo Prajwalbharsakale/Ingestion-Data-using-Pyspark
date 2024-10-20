@@ -116,6 +116,14 @@ Contributing
 
 Feel free to contribute by submitting a pull request.
 
+## Creating table in readme file
+we have to give "|" for column and "-" for rows sepration
+
+#### Example
+	|Col1|Col2|
+ 	|----|----|
+  	|value1|value2|
+   
 ### Creating the README File
 
 1. **Create the File**: You can create a `README.md` file using any text editor or command line.
