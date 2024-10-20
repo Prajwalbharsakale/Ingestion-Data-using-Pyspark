@@ -1,5 +1,3 @@
-Here’s a README.md file based on our conversation, including all the information about implementing SCD Type 2 in Snowflake using Python pandas. You can copy this text into a file named README.md and add it to your Git repository.
-
 # SCD Type 2 Implementation in Snowflake Using Python Pandas
 
 ## Overview
