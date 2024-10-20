@@ -22,7 +22,8 @@ from datetime import datetime
 def current_timestamp():
     return datetime.now()
 
-2. Create Source and Target Tables as DataFrames
+
+### 2. Create Source and Target Tables as DataFrames
 
 Source Table (Customer Data)
 
