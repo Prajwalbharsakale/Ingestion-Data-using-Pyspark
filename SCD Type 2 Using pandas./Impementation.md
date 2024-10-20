@@ -13,10 +13,20 @@ Install the required libraries:
 ```python
 pip install pandas
 
-Import pandas and create DataFrames to simulate the source and target tables.
+#Import pandas and create DataFrames to simulate the source and target tables.
 
+# Import python packages
 import pandas as pd
 from datetime import datetime
+
+#If the dataframe is large pandas will truncating the output with ....
+#for avoding truncating output setting up the display size
+
+#Set display options to show all columns and rows
+pd.set_option('display.max_columns',None) #Show all columns
+pd.set_option('display.max_rows',None) #Show all rows
+pd.set_option('display.max_colwidth',None) #Show full column width if needed
+
 
 # Create a function to simulate current timestamp for simplicity
 def current_timestamp():
@@ -29,70 +39,120 @@ def current_timestamp():
 
 Initial source data
 ```python
-data_source = {
-    "customer_id": [1, 2],
-    "first_name": ["John", "Jane"],
-    "last_name": ["Doe", "Smith"],
-    "email": ["john.doe@example.com", "jane.smith@example.com"],
-    "phone_number": ["123-456-7890", "987-654-3210"],
-    "updated_at": [pd.Timestamp('2023-01-01 12:00:00'), pd.Timestamp('2023-01-01 12:00:00')]
+#Initial source table
+
+data_source ={
+    "customer_id"  : [1,2,3,4,5,6],
+    "first_name"   : ["Prajwal","Shreyash","Rudresh","Abhijit","Pradyumn","Suyog"],
+    "last_name"    : ["Bharsakale","Nagpure","Pasarkar","Katore","Dharmale","Kulkarni"],
+    "email"        : ["pbhar@gmail.com","snag@gmail.com","rpas@gmail.com","akat@gmail.com","pdha@gmail.com","skul@gmail.com"],
+    "phone_number" : ["1234567890","0987654321","1234509876","0987612345","1234098567","8907652341"],
+    "update_at"    : [pd.Timestamp('2024-01-22 12:44:00'),pd.Timestamp('2024-04-29 09:55:59'),pd.Timestamp('2024-10-12 12:24:09'),pd.Timestamp('2024-09-22 11:32:07'),pd.Timestamp('2024-12-25 02:04:00'),pd.Timestamp('2024-06-22 08:31:50')]
 }
 
 df_source = pd.DataFrame(data_source)
+
+#this will show the index by deault
+print(df_source)
+
+print('-------------------------------------------------------------------')
+#To Avoid index in 1st column we can use
+print(df_source.to_string(index=False))
 ```
 
 #### Target Table (SCD Type 2)
 ```python
-# Create an empty DataFrame for the target SCD2 table
+#Create an empty DataFrame for the target SCD2 table
 df_scd2 = pd.DataFrame(columns=[
-    "customer_id", "first_name", "last_name", "email", "phone_number",
+    "customer_id", "first_name", "last_name", "email", "phone_number", 
     "start_date", "end_date", "current_flag"
 ])
-```
 
-```python
-# Initial data population for the SCD2 table from the source
+#Initial data population for the SCD2 table from the source
 df_scd2 = df_source.copy()
 df_scd2["start_date"] = current_timestamp()
 df_scd2["end_date"] = pd.NaT
 df_scd2["current_flag"] = True
+
+print(df_scd2)
+
+print('-------------------------------------------------------------------')
+#To Avoid index in 1st column we can use
+print(df_scd2.to_string(index=False))
 ```
 
 ### 3. Insert New Data into Source Table (Simulating Changes)
 
 Insert new records or changes into the source DataFrame. For instance, a change in email for customer_id = 1:
 ```python
-# New data inserted into source (simulating an update)
-new_data = {
-    "customer_id": [1],
-    "first_name": ["John"],
-    "last_name": ["Doe"],
-    "email": ["john.d.new@example.com"],  # Updated email
-    "phone_number": ["123-456-7890"],
-    "updated_at": [pd.Timestamp('2023-02-01 12:00:00')]
+#New data inserted into source (simulating an update)
+#Print pervious version of source
+print('-------------------------------------------------------------------')
+#To Avoid index in 1st column we can use
+print(df_source.to_string(index=False))
+
+new_data ={
+      "customer_id"  : [1],
+    "first_name"   : ["Prajwal"],
+    "last_name"    : ["Bharsakale"],
+    "email"        : ["pbharsakle@gmail.com"], #updated email
+    "phone_number" : ["1234567890"],
+    "update_at"    : [pd.Timestamp('2024-01-22 12:44:00')]
 }
 
 new_row = pd.DataFrame(new_data)
-df_source = pd.concat([df_source, new_row], ignore_index=True)
+df_source = pd.concat([df_source,new_row],ignore_index=True)
+
+print('-------------------------------------------------------------------')
+print(df_source.to_string(index=False))
+
 ```
 
 ### 4. SCD Type 2 Logic to Track Changes
 
 #### Step 1: Identify Changed Records
 ```python
-# Get only active records from the target (df_scd2)
+#We'll compare the source and target DataFrame and find any differences in non-key columns for active
+#records in the target
+
+#print orginal data
+print('-------------------------------------------------------------------')
+#To Avoid index in 1st column we can use
+print(df_source.to_string(index=False))
+
+
+#Indentify records with changes by comparing current active records
 df_active_scd2 = df_scd2[df_scd2["current_flag"] == True]
-# Join the source with active records from the target to find differences
-df_changes = pd.merge(df_source, df_active_scd2, on="customer_id", how="left", suffixes=('_src', '_tgt'))
-# Filter the records where there are changes in any non-key columns
-df_changes = df_changes[
-    (df_changes["first_name_src"] != df_changes["first_name_tgt"]) |
-    (df_changes["last_name_src"] != df_changes["last_name_tgt"]) |
-    (df_changes["email_src"] != df_changes["email_tgt"]) |
-    (df_changes["phone_number_src"] != df_changes["phone_number_tgt"])
+
+
+#print the records with current flag true
+print('-------------------------------------------------------------------')
+print(df_active_scd2.to_string(index=False))
+
+
+#Join source with target (active records only) to find the differences
+df_changes = pd.merge(df_source, df_active_scd2, on ="customer_id", how="left", suffixes=('_src','_tgt'))
+
+#print the change rows
+print('-------------------------------------------------------------------')
+print(df_changes.to_string(index=False))
+
+
+#Find rows with changes in any of the columns except 'customer_id'
+df_changes = df_changes [
+    (df_changes ["first_name_src"] != df_changes["first_name_tgt"]) |
+    (df_changes ["last_name_src"] != df_changes["last_name_tgt"]) |
+    (df_changes ["email_src"] != df_changes["email_tgt"]) |
+    (df_changes ["phone_number_src"] != df_changes["phone_number_tgt"])
 ]
-# Keep only the necessary columns from the source table (without _src suffix)
-df_changes = df_changes[["customer_id", "first_name_src", "last_name_src", "email_src", "phone_number_src"]]
+
+#select only changed records
+df_changes = df_changes[["customer_id","first_name_src","last_name_src","email_src","phone_number_src"]]
+
+#print the change rows
+print('-------------------------------------------------------------------')
+print(df_changes.to_string(index=False))
+
 ```
 
 #### Step 2: Expire the Old Record
@@ -105,31 +165,47 @@ df_scd2.loc[df_scd2["customer_id"].isin(df_changes["customer_id"]), "current_fla
 
 #### Step 3: Insert the New Record
 ```python
-# Prepare new records from the changed data
+#Prepare the new records for insertion
 df_new_records = df_changes.rename(columns={
-    "first_name_src": "first_name",
-    "last_name_src": "last_name",
-    "email_src": "email",
-    "phone_number_src": "phone_number"
+    "first_name_src":"first_name",
+    "last_name_src":"last_name",
+    "email_src":"email",
+    "phone_number_src":"phone_number"
 })
-# Add SCD2-specific columns to new records
+
+#Add SCD2-specific columns to new records
 df_new_records["start_date"] = current_timestamp()
 df_new_records["end_date"] = pd.NaT
 df_new_records["current_flag"] = True
-# Append the new records to the target (SCD2) table
-df_scd2 = pd.concat([df_scd2, df_new_records], ignore_index=True)
+
+#Append the new records to the SCD2 table
+df_scd2 = pd.concat([df_scd2,df_new_records], ignore_index=True)
+
 ```
 
 ### 5. Final Check for the Target Table
 ```python
-# Select only the required columns for the final SCD2 table
-df_scd2 = df_scd2[[
-    "customer_id", "first_name", "last_name", "email", "phone_number", 
-    "start_date", "end_date", "current_flag"
-]]
+#Drop unwanted columns such as 'update_at'
+df_scd2 = df_scd2.drop(columns=["updated_at"], errors='ignore')
 
-# Print the final DataFrame
-print(df_scd2)
+#Ensure no duplicate 'current_flag' column
+df_scd2 = df_scd2.loc[:, ~df_scd2.columns.duplicated()]
+
+#Select only the required columns for the final SCD2 table
+
+df_scd2 = df_scd2[["customer_id", "first_name", "last_name", "email", "phone_number",
+                   "start_date", "end_date", "current_flag" 
+]]
+#Print source data
+print('-------------------------------------------------------------------')
+#To Avoid index in 1st column we can use
+print(df_source.to_string(index=False))
+
+#Print Target data
+print('-------------------------------------------------------------------')
+#To Avoid index in 1st column we can use
+print(df_scd2.to_string(index=False))
+
 ```
 
 ## Troubleshooting
