@@ -28,7 +28,7 @@ def current_timestamp():
 #### Source Table (Customer Data)
 
 Initial source data
-```
+```bash
 data_source = {
     "customer_id": [1, 2],
     "first_name": ["John", "Jane"],
@@ -42,7 +42,7 @@ df_source = pd.DataFrame(data_source)
 ```
 
 #### Target Table (SCD Type 2)
-```
+```bash
 # Create an empty DataFrame for the target SCD2 table
 df_scd2 = pd.DataFrame(columns=[
     "customer_id", "first_name", "last_name", "email", "phone_number",
@@ -50,7 +50,7 @@ df_scd2 = pd.DataFrame(columns=[
 ])
 ```
 
-```
+```bash
 # Initial data population for the SCD2 table from the source
 df_scd2 = df_source.copy()
 df_scd2["start_date"] = current_timestamp()
@@ -61,7 +61,7 @@ df_scd2["current_flag"] = True
 ### 3. Insert New Data into Source Table (Simulating Changes)
 
 Insert new records or changes into the source DataFrame. For instance, a change in email for customer_id = 1:
-```
+```bash
 # New data inserted into source (simulating an update)
 new_data = {
     "customer_id": [1],
@@ -79,7 +79,7 @@ df_source = pd.concat([df_source, new_row], ignore_index=True)
 ### 4. SCD Type 2 Logic to Track Changes
 
 #### Step 1: Identify Changed Records
-	```
+	```bash
 	# Get only active records from the target (df_scd2)
 	df_active_scd2 = df_scd2[df_scd2["current_flag"] == True]
 	
@@ -99,14 +99,14 @@ df_source = pd.concat([df_source, new_row], ignore_index=True)
 	```
 
 #### Step 2: Expire the Old Record
-	```
+	```bash
 	# Expire old records in the target table by setting end_date and current_flag = False
 	df_scd2.loc[df_scd2["customer_id"].isin(df_changes["customer_id"]), "end_date"] = current_timestamp()
 	df_scd2.loc[df_scd2["customer_id"].isin(df_changes["customer_id"]), "current_flag"] = False
 	```
 
 #### Step 3: Insert the New Record
-	```
+	```bash
 	# Prepare new records from the changed data
 	df_new_records = df_changes.rename(columns={
 	    "first_name_src": "first_name",
@@ -125,7 +125,7 @@ df_source = pd.concat([df_source, new_row], ignore_index=True)
 	```
 
 ### 5. Final Check for the Target Table
-```
+```bash
 # Select only the required columns for the final SCD2 table
 df_scd2 = df_scd2[[
     "customer_id", "first_name", "last_name", "email", "phone_number", 
