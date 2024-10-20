@@ -21,10 +21,11 @@ from datetime import datetime
 # Create a function to simulate current timestamp for simplicity
 def current_timestamp():
     return datetime.now()
+```bash
 
+###2. Create Source and Target Tables as DataFrames
 
-### 2. Create Source and Target Tables as DataFrames
-
+```bash
 Source Table (Customer Data)
 
 # Initial source data
