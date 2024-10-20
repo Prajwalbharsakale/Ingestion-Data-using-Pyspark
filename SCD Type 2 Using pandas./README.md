@@ -96,7 +96,7 @@ df_changes = df_changes[["customer_id", "first_name_src", "last_name_src", "emai
 ```
 
 #### Step 2: Expire the Old Record
-```bash
+```python
 # Expire old records in the target table by setting end_date and current_flag = False
 df_scd2.loc[df_scd2["customer_id"].isin(df_changes["customer_id"]), "end_date"] = current_timestamp()
 df_scd2.loc[df_scd2["customer_id"].isin(df_changes["customer_id"]), "current_flag"] = False
