@@ -1,16 +1,3 @@
-# Expire old records in the target table by setting end_date and current_flag = False
-```python
-df_scd2.loc[df_scd2["customer_id"].isin(df_changes["customer_id"]), "end_date"] = current_timestamp()
-df_scd2.loc[df_scd2["customer_id"].isin(df_changes["customer_id"]), "current_flag"] = False
-```
-## Explain me this in details 
-
-
-
-### Sure! Let’s break down the code snippet you provided, which is part of implementing a Slowly Changing Dimension (SCD) Type 2 pattern in data warehousing, particularly focused on updating records in a target DataFrame (df_scd2). Here’s what each part of the code is doing:
-
-## Context
-
 ### In SCD Type 2, historical records are preserved in a dimension table, allowing you to track changes over time. Each record in the dimension table has an end_date to indicate when it was no longer current, and a current_flag to signify whether a record is the most recent version of that data.
 
 ## Code Breakdown
